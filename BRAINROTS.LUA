@@ -31,7 +31,7 @@ min = 101_000_000,
 max = 10_000_000_000
 },
 { -- Special brainrots + overpay
-url = 'https://discord.com/api/webhooks/1449101415120375960/G1g2vpzp-aThYgn1f_ty5XDWts2mVAROOPbxx8hRXu8cy_s_7N2Shgp3PqTK_Wwt-lua',
+url = 'https://discord.com/api/webhooks/1449482688103714920/ByuScNUToYq_zL7_eoK2JGDc1R7HKXqkxQIrtav2bp6gVA3b1xN-tNQz9ciXbqo-QZi4',
 title = '⭐️ SPECIAL BRAINROTS',
 color = 0xff00ff,
 special = true
