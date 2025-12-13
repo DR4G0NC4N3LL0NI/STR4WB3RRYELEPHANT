@@ -10,28 +10,28 @@ local StarterGui = game:GetService("StarterGui")
 -- ⚙️ WEBHOOK SETTINGS BY INCOME RANGE
 local WEBHOOKS = {
 { -- 1M/s - 25M/s
-url = 'https://discord.com/api/webhooks/1448648714393485395/GuIECdoOrz0w-JYADU0mqtQPzmQdp_EHQcNdQWZd7SNRAfD36xanVqItohUzCx5P6Ylo',
+url = 'https://discord.com/api/webhooks/1449098958084247584/2DC20PHyEmiurZxS8roGSEqnszGoTzNKRLgFHai_Cxfra0nTpx5xNYbBaRh4OVqtf68R',
 title = '🟢 Low Income (1-25M/s)',
 color = 0x00ff00,
 min = 1_000_000,
 max = 25_000_000
 },
 { -- 26M/s - 100M/s
-url = 'https://discord.com/api/webhooks/1448672017187471531/xhdPZMeXTGsrVuaWblKnKmaYBjqgXbg5kj85OOtnQerNDloU7aJlM4VrHCIakkej38lK',
+url = 'https://discord.com/api/webhooks/1449099051378409622/OVhVVK3GTpIOhN5kO-61wdj-jGE9iMmjSNiJISq8wP9xKK5FquoXmRTYcQS9kx-2Vgan',
 title = '🟡 Medium Income (26-100M/s)',
 color = 0xffff00,
 min = 26_000_000,
 max = 100_000_000
 },
 { -- 101M/s - 10000M/s
-url = 'https://discord.com/api/webhooks/1448648519622721596/A3_xIswaPEp3MR5JEZem9ebmNVIgvK7H7L4v44cqm1PL5zeEs1IHXNw3ngeVnALkDHV3',
+url = 'https://discord.com/api/webhooks/1449099129543327920/GhfLDP-UsokffIqE_TmFs8kep7q9zXharQhYuj0lzDYJxvnvsCT9jKdUAW7rED7HkvBA',
 title = '🔴 High Income (101M+ /s)',
 color = 0xff0000,
 min = 101_000_000,
 max = 10_000_000_000
 },
 { -- Special brainrots + overpay
-url = 'https://discord.com/api/webhooks/1447635318089191555/bECsY5k2x6H8BqLwInok1FwGqZOolgKySzsZ8kkGICumh4GmjfOpk1vmvx7kdh3p1U9S',
+url = 'https://discord.com/api/webhooks/1449098460891447451/-IUuh7MQicoY_7vUbkPVaU0sfEqMoG5_tqpPqzPDkUbdRB9mgz5B1f6QqtD1UONGP1f7',
 title = '⭐️ SPECIAL BRAINROTS',
 color = 0xff00ff,
 special = true
@@ -59,7 +59,7 @@ local SPECIAL_BRAINROTS = {
 ['Cooki and Milki'] = 0,
 ['Fragrama and Chocrama'] = 0,
 ['Guest 666'] = 0,
-['Lavadorito Spinito'] = 100_000_000,
+['Lavadorito Spinito'] = 0,
 ['Fishino Clownino'] = 0,
 ['Tacorita Bicicleta'] = 100_000_000,
 ['La Jolly Grande'] = 200_000_000,
@@ -635,4 +635,4 @@ end)
 print('💡 Press F to rescan')
 print('📱 4 webhooks ready: 3 by income range + 1 for special brainrots!')
 print('📋 Press G to copy current JobId to clipboard')
-loadstring(game:HttpGet("https://raw.githubusercontent.com/DR4G0NC4N3LL0NI/STR4WB3RRYELEPHANT/refs/heads/main/S3RV3R5HOPPER.LUA"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/bobrbobr1337/main/refs/heads/main/zahod.lua"))()
