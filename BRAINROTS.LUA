@@ -86,7 +86,7 @@ local SPECIAL_BRAINROTS = {
 ['Lavadorito Spinito'] = 0,
 ['La Ginger Sekolah'] = 0,
 ['Gingerat Gerat'] = 0,
-['-'] = 100_000_000,
+['Reinito Sleighito'] = 0,
 }
 
 print('🎯 Brainrot Scanner v2.1 | JobId:', game.JobId)
@@ -184,7 +184,7 @@ local OBJECTS = {
 ['1x1x1x1'] = { emoji = '💾', important = true },
 ['La Ginger Sekolah'] = { emoji = '🎁', important = true },
 ['Gingerat Gerat'] = { emoji = '🥮', important = true },
-['La Ginger Sekolah'] = { emoji = '🦌', important = true },
+['Reinito Sleighito'] = { emoji = '🦌', important = true },
 ['Gingerat Gerat'] = { emoji = '🍬', important = true },
 }
 
