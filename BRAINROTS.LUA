@@ -115,6 +115,8 @@ local SPECIAL_BRAINROTS = {
     ['La Ginger Sekolah'] = 0,
     ['Gingerat Gerat'] = 0,
     ['Reinito Sleighito'] = 0,
+    ['Swaggy Bros'] = 0,
+    ['Gingerbread Dragon'] = 0,
 }
 
 -- 🎮 OBJECTS WITH EMOJIS AND IMPORTANCE
@@ -212,6 +214,8 @@ local OBJECTS = {
     ['Gingerat Gerat'] = { emoji = '🥮', important = true },
     ['Reinito Sleighito'] = { emoji = '🦌', important = true },
     ['Gingerat Gerat'] = { emoji = '🍬', important = true },
+    ['Swaggy Bros'] = { emoji = '🥤', important = true },
+    ['Gingerbread Dragon'] = { emoji = '🥠', important = true },
 }
 
 -- IMPORTANT OBJECTS TABLE
