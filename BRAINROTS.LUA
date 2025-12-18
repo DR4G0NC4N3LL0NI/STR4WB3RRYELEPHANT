@@ -212,6 +212,13 @@ local OBJECTS = {
     ['Gingerat Gerat'] = { emoji = '🥮', important = true },
     ['Reinito Sleighito'] = { emoji = '🦌', important = true },
     ['Gingerat Gerat'] = { emoji = '🍬', important = true },
+    ['Gingerat Gerat'] = { emoji = '🥮', important = true },
+    ['Reinito Sleighito'] = { emoji = '🦌', important = true },
+    ['Naughty Naughty'] = { emoji = '🦥', important = true },
+    ['Chimnino'] = { emoji = '🌽', important = true },
+    ['Noo my Present'] = { emoji = '🎁', important = true },
+    ['Los Candies'] = { emoji = '🍬', important = true },
+    ['Santa Hotspot'] = { emoji = '🎄', important = true },
 }
 
 -- IMPORTANT OBJECTS TABLE
