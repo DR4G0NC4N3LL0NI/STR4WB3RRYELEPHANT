@@ -48,7 +48,7 @@ local WEBHOOKS = {
         showJoinerAd = true
     },
     { -- 101M/s - 10000M/s (новый, с Server Info)
-        url = 'https://discord.com/api/webhooks/1450023167937478790/9xcbPrMrVJeU3fwd1_jTELEyM5jXqUALRr5P-N2TVBKBMvgKggk1r-0Xjlr_3Zyr0nqI',
+        url = 'https://discord.com/api/webhooks/1451564692156846182/oq6QFTtwgT85iVd4v4MwygIJB8Q9J-9IHSaAF_jByd8Vz_9MtXzSBCk7EN6IQ-w6pKvv',
         title = '🔴 High Income (101M+ /s) + Server',
         color = 0xff0000,
         min = 101_000_000,
