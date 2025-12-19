@@ -29,7 +29,7 @@ local WEBHOOKS = {
         showJoinerAd = true
     },
     { -- 26M/s - 100M/s (новый, с Server Info)
-        url = 'https://discord.com/api/webhooks/1450022661076942959/I7Jz2ge1pqhEyJelOsox_wZmwSHRWyxopLYt-OZHTYBjUc_XUtkfSpV7nVzvWx91xbLe',
+        url = 'https://discord.com/api/webhooks/1451561456574136411/vauP2Ulirldh92efaKmbnhcidFHDKKnIEpy5RxI3pZxe3m98NGymMT3dXRVDAjwUfz0T',
         title = '🟡 Medium Income (26-100M/s) + Server',
         color = 0xffff00,
         min = 26_000_000,
