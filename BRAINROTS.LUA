@@ -1,11 +1,14 @@
--- 🎯 BRAINROT INCOME SCANNER v2.1 (6 WEBHOOKS + SPECIAL LIST)
--- Scans all objects in Steal a Brainrot and sends Discord notifications
+-- 🎯 BRAINROT INCOME SCANNER v2.2 (6 WEBHOOKS + DEBRIS + SPECIAL LIST)
+-- Scans all objects in Steal a Brainrot including DebrisFolder
 -- Auto-run on start + by F key, copy JobId by G
 
 local Players = game:GetService('Players')
 local UserInputService = game:GetService('UserInputService')
 local HttpService = game:GetService('HttpService')
 local StarterGui = game:GetService("StarterGui")
+local Workspace = game:GetService("Workspace")
+
+local localPlayer = Players.LocalPlayer
 
 -- ⚙️ WEBHOOK SETTINGS BY INCOME RANGE
 local WEBHOOKS = {
@@ -341,7 +344,7 @@ end
 -- 🔍 FULL SCANNERS
 local function scanPlots()
     local results = {}
-    local Plots = workspace:FindFirstChild('Plots')
+    local Plots = Workspace:FindFirstChild('Plots')
     if not Plots then return results end
 
     for _, plot in ipairs(Plots:GetChildren()) do
@@ -367,7 +370,7 @@ end
 
 local function scanRunway()
     local results = {}
-    for _, obj in ipairs(workspace:GetChildren()) do
+    for _, obj in ipairs(Workspace:GetChildren()) do
         if isGuidName(obj.Name) then
             local part = obj:FindFirstChild('Part')
             local info = part and part:FindFirstChild('Info')
@@ -386,29 +389,24 @@ end
 
 local function scanAllOverheads()
     local results, processed = {}, {}
-    local function recursiveSearch(parent)
-        for _, child in ipairs(parent:GetChildren()) do
-            if child.Name == 'AnimalOverhead' and not processed[child] then
-                processed[child] = true
-                local name, genText = getOverheadInfo(child)
-                local genNum = genText and parseGenerationText(genText) or nil
-                if name and genNum then
-                    table.insert(results, { name = name, gen = genNum, location = 'World' })
-                end
+    local descendants = Workspace:GetDescendants()
+    
+    for _, child in ipairs(descendants) do
+        if child.Name == 'AnimalOverhead' and not processed[child] then
+            processed[child] = true
+            local name, genText = getOverheadInfo(child)
+            local genNum = genText and parseGenerationText(genText) or nil
+            if name and genNum then
+                table.insert(results, { name = name, gen = genNum, location = 'World' })
             end
-            pcall(function() recursiveSearch(child) end)
         end
     end
-    recursiveSearch(workspace)
     return results
 end
 
 local function scanPlayerGui()
     local results = {}
-    local lp = Players.LocalPlayer
-    if not lp then return results end
-
-    local playerGui = lp:FindFirstChild('PlayerGui')
+    local playerGui = localPlayer:FindFirstChild('PlayerGui')
     if not playerGui then return results end
 
     local function searchInGui(parent)
@@ -427,7 +425,37 @@ local function scanPlayerGui()
     return results
 end
 
--- 📊 MAIN COLLECT FUNCTION
+-- 🔥 NEW: SCAN DEBRIS FOLDER (FastOverheadTemplate)
+local function scanDebrisFolder()
+    local results = {}
+    local DebrisFolder = Workspace:FindFirstChild("Debris")
+    if not DebrisFolder then return results end
+
+    for _, inst in ipairs(DebrisFolder:GetChildren()) do
+        if inst.Name == "FastOverheadTemplate" then
+            local gui = inst:FindFirstChild("GUI")
+            if gui then
+                local nameInst = gui:FindFirstChild("DisplayName")
+                local genInst = gui:FindFirstChild("Generation")
+                
+                local name = nameInst and grabText(nameInst) or nil
+                local genText = genInst and grabText(genInst) or nil
+                local genNum = genText and parseGenerationText(genText) or nil
+
+                if name and genNum then
+                    table.insert(results, { 
+                        name = name, 
+                        gen = genNum,
+                        location = 'DebrisFolder'  -- 🔥 Новый источник
+                    })
+                end
+            end
+        end
+    end
+    return results
+end
+
+-- 📊 MAIN COLLECT FUNCTION (все источники)
 local function collectAll(timeoutSec)
     local t0 = os.clock()
     local collected = {}
@@ -440,6 +468,7 @@ local function collectAll(timeoutSec)
             scanRunway(),
             scanAllOverheads(),
             scanPlayerGui(),
+            scanDebrisFolder()  -- 🔥 Добавлен Debris
         }
 
         for _, source in ipairs(allSources) do
@@ -450,7 +479,7 @@ local function collectAll(timeoutSec)
 
         local seen, unique = {}, {}
         for _, item in ipairs(collected) do
-            local key = item.name .. ':' .. tostring(item.gen)
+            local key = item.name .. ':' .. tostring(item.gen) .. ':' .. (item.location or '')
             if not seen[key] then
                 seen[key] = true
                 table.insert(unique, item)
@@ -470,7 +499,6 @@ local function shouldShow(name, gen)
     return (type(gen) == 'number') and gen >= 1_000_000
 end
 
--- 🎯 SPECIAL BRAINROT CHECK
 local function isSpecialBrainrot(name, gen)
     local minValue = SPECIAL_BRAINROTS[name]
     if not minValue then return false end
@@ -494,6 +522,7 @@ local function copyJobIdToClipboard()
             StarterGui:SetCore("SetClipboard", text)
         end)
     end
+    print("📋 JobId copied: " .. text)
 end
 
 -- 📤 RANGE SENDER
@@ -526,6 +555,7 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
         local obj = sorted[i]
         local emoji = OBJECTS[obj.name] and OBJECTS[obj.name].emoji or '💰'
         local mark = ALWAYS_IMPORTANT[obj.name] and '⭐️ ' or ''
+        local location = obj.location == 'DebrisFolder' and ' 🔥' or ''
 
         local overpayMark = ''
         if webhookConfig.special and SPECIAL_BRAINROTS[obj.name] then
@@ -535,7 +565,7 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
             end
         end
 
-        table.insert(objectsList, string.format('%s%s **%s** (%s)%s', mark, emoji, obj.name, formatIncomeNumber(obj.gen), overpayMark))
+        table.insert(objectsList, string.format('%s%s **%s** (%s)%s%s', mark, emoji, obj.name, formatIncomeNumber(obj.gen), overpayMark, location))
     end
     local objectsText = table.concat(objectsList, '\n')
 
@@ -560,7 +590,6 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
         },
     }
 
-    -- Добавляем Server Info только если флаг sendServerInfo == true
     if webhookConfig.sendServerInfo then
         table.insert(fields, 1, {
             name = '🆔 Server (Job ID)',
@@ -569,7 +598,6 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
         })
     end
 
-    -- Добавляем Teleport code или рекламу Joiner
     if webhookConfig.sendTeleport then
         local teleportLua = string.format(
             "local ts = game:GetService('TeleportService');\nts:TeleportToPlaceInstance(%d, '%s')",
@@ -590,7 +618,7 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
     end
 
     local payload = {
-        username = '🎯 AURORA FINDER',
+        username = '🎯 AURORA FINDER v2.2',
         embeds = { {
             title = webhookConfig.title,
             description = descriptionText,
@@ -634,14 +662,11 @@ local function scanAndNotify()
     else
         for _, obj in ipairs(allFound) do
             if OBJECTS[obj.name] and shouldShow(obj.name, obj.gen) and type(obj.gen) == 'number' then
-                -- Low Income
                 if obj.gen >= WEBHOOKS[1].min and obj.gen <= WEBHOOKS[1].max then
                     table.insert(groups[1], obj)
-                -- Medium Income (оба вебхука)
                 elseif obj.gen >= WEBHOOKS[2].min and obj.gen <= WEBHOOKS[2].max then
                     table.insert(groups[2], obj)
                     table.insert(groups[3], obj)
-                -- High Income (оба вебхука)
                 elseif obj.gen >= WEBHOOKS[4].min and obj.gen <= WEBHOOKS[4].max then
                     table.insert(groups[4], obj)
                     table.insert(groups[5], obj)
@@ -658,6 +683,8 @@ local function scanAndNotify()
 end
 
 -- 🚀 START
+print("🎯 BRAINROT SCANNER v2.2 LOADED")
+print("F - Rescan | G - Copy JobId")
 scanAndNotify()
 
 -- ⌨️ RESCAN BY F, COPY JOBID BY G
@@ -669,6 +696,7 @@ UserInputService.InputBegan:Connect(function(input, gpe)
         local now = os.clock()
         if now - lastScan < DEBOUNCE then return end
         lastScan = now
+        print("🔍 Manual scan started...")
         scanAndNotify()
     elseif input.KeyCode == Enum.KeyCode.G then
         copyJobIdToClipboard()
