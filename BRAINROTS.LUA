@@ -116,6 +116,7 @@ local SPECIAL_BRAINROTS = {
     ['La Ginger Sekolah'] = 225_000_000,
     ['Gingerat Gerat'] = 0,
     ['Reinito Sleighito'] = 0,
+    ['Dragon Gingerini'] = 0,
 }
 
 -- 🎮 OBJECTS WITH EMOJIS AND IMPORTANCE
@@ -246,6 +247,7 @@ local OBJECTS = {
     ['Karkerkar Kurkur'] = { emoji = '🪑', important = true },
     ['Los Matteos'] = { emoji = '🕶', important = true },
     ['Bisonte Giuppitere'] = { emoji = '🦬', important = true },
+    ['Dragon Gingerini'] = { emoji = '🐲', important = true },
 }
 
 local ALWAYS_IMPORTANT = {}
