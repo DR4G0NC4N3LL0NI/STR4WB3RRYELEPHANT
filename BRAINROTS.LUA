@@ -110,7 +110,7 @@ local SPECIAL_BRAINROTS = {
     ['Esok Sekolah'] = 300_000_000,
     ['Nuclearo Dinossauro'] = 100_000_000,
     ['Lavadorito Spinito'] = 0,
-    ['La Ginger Sekolah'] = 0,
+    ['La Ginger Sekolah'] = 225_000_000,
     ['Gingerat Gerat'] = 0,
     ['Reinito Sleighito'] = 0,
 }
