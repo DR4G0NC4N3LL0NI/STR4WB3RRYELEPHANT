@@ -248,7 +248,6 @@ local OBJECTS = {
     ['Bisonte Giuppitere'] = { emoji = '🦬', important = true },
 }
 
--- IMPORTANT OBJECTS TABLE
 local ALWAYS_IMPORTANT = {}
 for name, cfg in pairs(OBJECTS) do
     if cfg.important then
@@ -425,7 +424,7 @@ local function scanPlayerGui()
     return results
 end
 
--- 🔥 NEW: SCAN DEBRIS FOLDER (FastOverheadTemplate)
+-- 🔥 SCAN DEBRIS FOLDER (без текста "Debris" в уведах)
 local function scanDebrisFolder()
     local results = {}
     local DebrisFolder = Workspace:FindFirstChild("Debris")
@@ -446,7 +445,7 @@ local function scanDebrisFolder()
                     table.insert(results, { 
                         name = name, 
                         gen = genNum,
-                        location = 'DebrisFolder'  -- 🔥 Новый источник
+                        location = 'DebrisFolder'
                     })
                 end
             end
@@ -455,7 +454,7 @@ local function scanDebrisFolder()
     return results
 end
 
--- 📊 MAIN COLLECT FUNCTION (все источники)
+-- 📊 MAIN COLLECT FUNCTION
 local function collectAll(timeoutSec)
     local t0 = os.clock()
     local collected = {}
@@ -468,7 +467,7 @@ local function collectAll(timeoutSec)
             scanRunway(),
             scanAllOverheads(),
             scanPlayerGui(),
-            scanDebrisFolder()  -- 🔥 Добавлен Debris
+            scanDebrisFolder()
         }
 
         for _, source in ipairs(allSources) do
@@ -525,7 +524,7 @@ local function copyJobIdToClipboard()
     print("📋 JobId copied: " .. text)
 end
 
--- 📤 RANGE SENDER
+-- 📤 RANGE SENDER (без текста Debris)
 local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
     local req = getRequester()
     if not req then return end
@@ -555,7 +554,9 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
         local obj = sorted[i]
         local emoji = OBJECTS[obj.name] and OBJECTS[obj.name].emoji or '💰'
         local mark = ALWAYS_IMPORTANT[obj.name] and '⭐️ ' or ''
-        local location = obj.location == 'DebrisFolder' and ' 🔥' or ''
+
+        -- если хочешь всё-таки пометку для Debris – оставь только 🔥
+        local locationMark = obj.location == 'DebrisFolder' and ' 🔥' or ''
 
         local overpayMark = ''
         if webhookConfig.special and SPECIAL_BRAINROTS[obj.name] then
@@ -565,7 +566,15 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
             end
         end
 
-        table.insert(objectsList, string.format('%s%s **%s** (%s)%s%s', mark, emoji, obj.name, formatIncomeNumber(obj.gen), overpayMark, location))
+        table.insert(objectsList, string.format(
+            '%s%s **%s** (%s)%s%s',
+            mark,
+            emoji,
+            obj.name,
+            formatIncomeNumber(obj.gen),
+            overpayMark,
+            locationMark
+        ))
     end
     local objectsText = table.concat(objectsList, '\n')
 
@@ -641,7 +650,7 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
     end)
 end
 
--- 🎮 MAIN FUNCTION (6 WEBHOOKS)
+-- 🎮 MAIN FUNCTION
 local function scanAndNotify()
     local allFound = collectAll(8.0)
 
