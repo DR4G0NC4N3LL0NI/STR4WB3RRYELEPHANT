@@ -247,7 +247,9 @@ local OBJECTS = {
     ['Karkerkar Kurkur'] = { emoji = '🪑', important = true },
     ['Los Matteos'] = { emoji = '🕶', important = true },
     ['Bisonte Giuppitere'] = { emoji = '🦬', important = true },
-    ['Dragon Gingerini'] = { emoji = '🐲', important = true },
+    ['Los 25'] = { emoji = '💀', important = true },
+    ['25'] = { emoji = '💄', important = true },
+    ['Dragon Gingerini'] = { emoji = '🐍', important = true },
 }
 
 local ALWAYS_IMPORTANT = {}
