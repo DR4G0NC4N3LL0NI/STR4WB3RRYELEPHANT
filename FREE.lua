@@ -61,6 +61,7 @@ local SPECIAL_BRAINROTS = {
     ['Dragon Cannelloni'] = 0,
     ['Strawberry Elephant'] = 0,
     ['Dragon Gingerini'] = 0,
+    ['Headless Horseman'] = 0,
 }
 
 -- 🎮 OBJECTS WITH EMOJIS AND IMPORTANCE
