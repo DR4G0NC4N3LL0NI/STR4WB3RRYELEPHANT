@@ -1,11 +1,18 @@
--- 🎯 BRAINROT INCOME SCANNER v2.1 (6 WEBHOOKS + SPECIAL LIST)
--- Scans all objects in Steal a Brainrot and sends Discord notifications
+-- 🎯 BRAINROT INCOME SCANNER v2.3 (WEBHOOKS + DEBRIS + SPECIAL LIST + VDS FORWARD)
+-- FIXED:
+-- 1) Removed 2 server-info webhooks (Medium+Server, High+Server) as requested.
+-- 2) If ANY special is found in a scan: NOTHING is sent to VDS (neither special nor non-special).
+-- 3) Special notification NEVER sent to VDS.
+-- 4) Added basic HTTP status warnings for Discord webhook sends.
 -- Auto-run on start + by F key, copy JobId by G
 
 local Players = game:GetService('Players')
 local UserInputService = game:GetService('UserInputService')
 local HttpService = game:GetService('HttpService')
 local StarterGui = game:GetService("StarterGui")
+local Workspace = game:GetService("Workspace")
+
+local localPlayer = Players.LocalPlayer
 
 -- ⚙️ WEBHOOK SETTINGS BY INCOME RANGE
 local WEBHOOKS = {
@@ -28,15 +35,6 @@ local WEBHOOKS = {
         sendTeleport = false,
         showJoinerAd = true
     },
-    { -- 26M/s - 100M/s (новый, с Server Info)
-        url = 'https://discord.com/api/webhooks/1451561456574136411/vauP2Ulirldh92efaKmbnhcidFHDKKnIEpy5RxI3pZxe3m98NGymMT3dXRVDAjwUfz0T',
-        title = '🟡 Medium Income (26-100M/s) + Server',
-        color = 0xffff00,
-        min = 26_000_000,
-        max = 100_000_000,
-        sendServerInfo = true,
-        sendTeleport = true
-    },
     { -- 101M/s - 10000M/s (основной, без Server Info)
         url = 'https://discord.com/api/webhooks/1449099129543327920/GhfLDP-UsokffIqE_TmFs8kep7q9zXharQhYuj0lzDYJxvnvsCT9jKdUAW7rED7HkvBA',
         title = '🔴 High Income (101M+ /s)',
@@ -47,17 +45,8 @@ local WEBHOOKS = {
         sendTeleport = false,
         showJoinerAd = true
     },
-    { -- 101M/s - 10000M/s (новый, с Server Info)
-        url = 'https://discord.com/api/webhooks/1451564692156846182/oq6QFTtwgT85iVd4v4MwygIJB8Q9J-9IHSaAF_jByd8Vz_9MtXzSBCk7EN6IQ-w6pKvv',
-        title = '🔴 High Income (101M+ /s) + Server',
-        color = 0xff0000,
-        min = 101_000_000,
-        max = 10_000_000_000,
-        sendServerInfo = true,
-        sendTeleport = true
-    },
     { -- Special brainrots + overpay
-        url = 'https://discord.com/api/webhooks/1449111713428275282/1CByDVDPiQUqD0r59w9DxtJ1F9CUpjbXzPrnA_kvtRvz2KIKpXMMBdTM2kYkYswTP45I',
+        url = 'https://discord.com/api/webhooks/1449482688103714920/ByuScNUToYq_zL7_eoK2JGDc1R7HKXqkxQIrtav2bp6gVA3b1xN-tNQz9ciXbqo-QZi4',
         title = '⭐️ SPECIAL BRAINROTS',
         color = 0xff00ff,
         special = true,
@@ -68,11 +57,10 @@ local WEBHOOKS = {
 
 -- 📋 SPECIAL BRAINROTS WITH MIN VALUES
 local SPECIAL_BRAINROTS = {
+    ['Meowl'] = 0,
     ['Dragon Cannelloni'] = 0,
     ['Strawberry Elephant'] = 0,
-    ['Meowl'] = 0,
-    ['Headless Horseman'] = 0,
-    ['Gingerbread Dragon'] = 0,
+    ['Dragon Gingerini'] = 0,
 }
 
 -- 🎮 OBJECTS WITH EMOJIS AND IMPORTANCE
@@ -103,7 +91,6 @@ local OBJECTS = {
     ['La Secret Combinasion'] = { emoji = '🕵️', important = true },
     ['La Karkerkar Combinasion'] = { emoji = '🤖', important = false },
     ['Los Bros'] = { emoji = '👊', important = true },
-    ['Tralaledon'] = { emoji = '🦕', important = true },
     ['La Extinct Grande'] = { emoji = '💀', important = true },
     ['Las Sis'] = { emoji = '👭', important = true },
     ['Tacorita Bicicleta'] = { emoji = '🌮', important = true },
@@ -203,9 +190,11 @@ local OBJECTS = {
     ['Karkerkar Kurkur'] = { emoji = '🪑', important = true },
     ['Los Matteos'] = { emoji = '🕶', important = true },
     ['Bisonte Giuppitere'] = { emoji = '🦬', important = true },
+    ['Los 25'] = { emoji = '💀', important = true },
+    ['25'] = { emoji = '💄', important = true },
+    ['Dragon Gingerini'] = { emoji = '🐍', important = true },
 }
 
--- IMPORTANT OBJECTS TABLE
 local ALWAYS_IMPORTANT = {}
 for name, cfg in pairs(OBJECTS) do
     if cfg.important then
@@ -213,7 +202,6 @@ for name, cfg in pairs(OBJECTS) do
     end
 end
 
--- 💰 INCOME PARSER
 local function parseGenerationText(s)
     if type(s) ~= 'string' or s == '' then return nil end
     local norm = s:gsub('%$', ''):gsub(',', ''):gsub('%s+', '')
@@ -245,7 +233,6 @@ local function formatIncomeNumber(n)
     end
 end
 
--- 📝 UI TEXT GRABBER
 local function grabText(inst)
     if not inst then return nil end
     if inst:IsA('TextLabel') or inst:IsA('TextButton') or inst:IsA('TextBox') then
@@ -298,10 +285,9 @@ local function isGuidName(s)
     return s:match('^[0-9a-fA-F]+%-%x+%-%x+%-%x+%-%x+$') ~= nil
 end
 
--- 🔍 FULL SCANNERS
 local function scanPlots()
     local results = {}
-    local Plots = workspace:FindFirstChild('Plots')
+    local Plots = Workspace:FindFirstChild('Plots')
     if not Plots then return results end
 
     for _, plot in ipairs(Plots:GetChildren()) do
@@ -327,7 +313,7 @@ end
 
 local function scanRunway()
     local results = {}
-    for _, obj in ipairs(workspace:GetChildren()) do
+    for _, obj in ipairs(Workspace:GetChildren()) do
         if isGuidName(obj.Name) then
             local part = obj:FindFirstChild('Part')
             local info = part and part:FindFirstChild('Info')
@@ -346,29 +332,24 @@ end
 
 local function scanAllOverheads()
     local results, processed = {}, {}
-    local function recursiveSearch(parent)
-        for _, child in ipairs(parent:GetChildren()) do
-            if child.Name == 'AnimalOverhead' and not processed[child] then
-                processed[child] = true
-                local name, genText = getOverheadInfo(child)
-                local genNum = genText and parseGenerationText(genText) or nil
-                if name and genNum then
-                    table.insert(results, { name = name, gen = genNum, location = 'World' })
-                end
+    local descendants = Workspace:GetDescendants()
+
+    for _, child in ipairs(descendants) do
+        if child.Name == 'AnimalOverhead' and not processed[child] then
+            processed[child] = true
+            local name, genText = getOverheadInfo(child)
+            local genNum = genText and parseGenerationText(genText) or nil
+            if name and genNum then
+                table.insert(results, { name = name, gen = genNum, location = 'World' })
             end
-            pcall(function() recursiveSearch(child) end)
         end
     end
-    recursiveSearch(workspace)
     return results
 end
 
 local function scanPlayerGui()
     local results = {}
-    local lp = Players.LocalPlayer
-    if not lp then return results end
-
-    local playerGui = lp:FindFirstChild('PlayerGui')
+    local playerGui = localPlayer:FindFirstChild('PlayerGui')
     if not playerGui then return results end
 
     local function searchInGui(parent)
@@ -387,7 +368,31 @@ local function scanPlayerGui()
     return results
 end
 
--- 📊 MAIN COLLECT FUNCTION
+local function scanDebrisFolder()
+    local results = {}
+    local DebrisFolder = Workspace:FindFirstChild("Debris")
+    if not DebrisFolder then return results end
+
+    for _, inst in ipairs(DebrisFolder:GetChildren()) do
+        if inst.Name == "FastOverheadTemplate" then
+            local gui = inst:FindFirstChild("GUI")
+            if gui then
+                local nameInst = gui:FindFirstChild("DisplayName")
+                local genInst = gui:FindFirstChild("Generation")
+
+                local name = nameInst and grabText(nameInst) or nil
+                local genText = genInst and grabText(genInst) or nil
+                local genNum = genText and parseGenerationText(genText) or nil
+
+                if name and genNum then
+                    table.insert(results, { name = name, gen = genNum, location = 'DebrisFolder' })
+                end
+            end
+        end
+    end
+    return results
+end
+
 local function collectAll(timeoutSec)
     local t0 = os.clock()
     local collected = {}
@@ -395,12 +400,7 @@ local function collectAll(timeoutSec)
     repeat
         collected = {}
 
-        local allSources = {
-            scanPlots(),
-            scanRunway(),
-            scanAllOverheads(),
-            scanPlayerGui(),
-        }
+        local allSources = { scanPlots(), scanRunway(), scanAllOverheads(), scanPlayerGui(), scanDebrisFolder() }
 
         for _, source in ipairs(allSources) do
             for _, item in ipairs(source) do
@@ -410,7 +410,7 @@ local function collectAll(timeoutSec)
 
         local seen, unique = {}, {}
         for _, item in ipairs(collected) do
-            local key = item.name .. ':' .. tostring(item.gen)
+            local key = item.name .. ':' .. tostring(item.gen) .. ':' .. (item.location or '')
             if not seen[key] then
                 seen[key] = true
                 table.insert(unique, item)
@@ -430,19 +430,16 @@ local function shouldShow(name, gen)
     return (type(gen) == 'number') and gen >= 1_000_000
 end
 
--- 🎯 SPECIAL BRAINROT CHECK
 local function isSpecialBrainrot(name, gen)
     local minValue = SPECIAL_BRAINROTS[name]
     if not minValue then return false end
     return gen >= minValue
 end
 
--- 🔗 EXECUTOR REQUEST
 local function getRequester()
     return http_request or request or (syn and syn.request) or (fluxus and fluxus.request) or (KRNL_HTTP and KRNL_HTTP.request)
 end
 
--- 📋 COPY JOBID TO CLIPBOARD (G KEY)
 local function copyJobIdToClipboard()
     local jobId = game.JobId
     local text = tostring(jobId)
@@ -454,10 +451,47 @@ local function copyJobIdToClipboard()
             StarterGui:SetCore("SetClipboard", text)
         end)
     end
+    print("📋 JobId copied: " .. text)
 end
 
--- 📤 RANGE SENDER
-local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
+local function sendToVDS(filteredObjects, webhookConfig)
+    local req = getRequester()
+    if not req then return end
+    if #filteredObjects == 0 then return end
+
+    local payload = {
+        jobId = game.JobId,
+        placeId = game.PlaceId,
+        title = webhookConfig.title,
+        color = webhookConfig.color,
+        range = { min = webhookConfig.min, max = webhookConfig.max },
+        special = webhookConfig.special or false,
+        sendServerInfo = webhookConfig.sendServerInfo or false,
+        time = os.time(),
+        objects = {},
+    }
+
+    for _, obj in ipairs(filteredObjects) do
+        table.insert(payload.objects, {
+            name = obj.name,
+            gen = obj.gen,
+            location = obj.location,
+            important = ALWAYS_IMPORTANT[obj.name] or false,
+            isSpecial = isSpecialBrainrot(obj.name, obj.gen),
+        })
+    end
+
+    pcall(function()
+        req({
+            Url = "http://95.81.99.228:3000/brainrot",
+            Method = "POST",
+            Headers = { ["Content-Type"] = "application/json" },
+            Body = HttpService:JSONEncode(payload),
+        })
+    end)
+end
+
+local function sendDiscordNotificationByRange(filteredObjects, webhookConfig, allowVDS)
     local req = getRequester()
     if not req then return end
     if #filteredObjects == 0 then return end
@@ -486,6 +520,7 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
         local obj = sorted[i]
         local emoji = OBJECTS[obj.name] and OBJECTS[obj.name].emoji or '💰'
         local mark = ALWAYS_IMPORTANT[obj.name] and '⭐️ ' or ''
+        local locationMark = obj.location == 'DebrisFolder' and ' 🔥' or ''
 
         local overpayMark = ''
         if webhookConfig.special and SPECIAL_BRAINROTS[obj.name] then
@@ -495,8 +530,9 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
             end
         end
 
-        table.insert(objectsList, string.format('%s%s **%s** (%s)%s', mark, emoji, obj.name, formatIncomeNumber(obj.gen), overpayMark))
+        table.insert(objectsList, string.format('%s%s **%s** (%s)%s%s', mark, emoji, obj.name, formatIncomeNumber(obj.gen), overpayMark, locationMark))
     end
+
     local objectsText = table.concat(objectsList, '\n')
 
     local descriptionText = webhookConfig.special
@@ -508,39 +544,17 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
         or string.format('**%s - %s**', formatIncomeNumber(webhookConfig.min), formatIncomeNumber(webhookConfig.max))
 
     local fields = {
-        {
-            name = '📊 Income range',
-            value = rangeText,
-            inline = true,
-        },
-        {
-            name = '💰 Objects:',
-            value = objectsText,
-            inline = false,
-        },
+        { name = '📊 Income range', value = rangeText, inline = true },
+        { name = '💰 Objects:', value = objectsText, inline = false },
     }
 
-    -- Добавляем Server Info только если флаг sendServerInfo == true
     if webhookConfig.sendServerInfo then
-        table.insert(fields, 1, {
-            name = '🆔 Server (Job ID)',
-            value = tostring(jobId),
-            inline = true,
-        })
+        table.insert(fields, 1, { name = '🆔 Server (Job ID)', value = tostring(jobId), inline = true })
     end
 
-    -- Добавляем Teleport code или рекламу Joiner
     if webhookConfig.sendTeleport then
-        local teleportLua = string.format(
-            "local ts = game:GetService('TeleportService');\nts:TeleportToPlaceInstance(%d, '%s')",
-            placeId,
-            jobId
-        )
-        table.insert(fields, {
-            name = '🚀 Teleport code:',
-            value = teleportLua,
-            inline = false,
-        })
+        local teleportLua = string.format("local ts = game:GetService('TeleportService');\nts:TeleportToPlaceInstance(%d, '%s')", placeId, jobId)
+        table.insert(fields, { name = '🚀 Teleport code:', value = teleportLua, inline = false })
     elseif webhookConfig.showJoinerAd then
         table.insert(fields, {
             name = '💎 Want convenience and see the server?',
@@ -550,77 +564,84 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
     end
 
     local payload = {
-        username = '🎯 AURORA FINDER',
+        username = '🎯 AURORA FINDER v2.3',
         embeds = { {
             title = webhookConfig.title,
             description = descriptionText,
             color = webhookConfig.color,
             fields = fields,
-            footer = {
-                text = string.format('Found: %d • %s', #filteredObjects, os.date('%H:%M:%S')),
-            },
+            footer = { text = string.format('Found: %d • %s', #filteredObjects, os.date('%H:%M:%S')) },
             timestamp = DateTime.now():ToIsoDate(),
         } },
     }
 
-    pcall(function()
-        req({
+    local ok, resp = pcall(function()
+        return req({
             Url = webhookConfig.url,
             Method = 'POST',
             Headers = { ['Content-Type'] = 'application/json' },
             Body = HttpService:JSONEncode(payload),
         })
     end)
+
+    if not ok then
+        warn('Discord webhook request failed: ' .. tostring(resp))
+    elseif resp and resp.StatusCode and resp.StatusCode >= 300 then
+        warn('Discord webhook HTTP ' .. tostring(resp.StatusCode) .. ': ' .. tostring(resp.Body))
+    end
+
+    if allowVDS then
+        sendToVDS(filteredObjects, webhookConfig)
+    end
 end
 
--- 🎮 MAIN FUNCTION (6 WEBHOOKS)
 local function scanAndNotify()
     local allFound = collectAll(8.0)
 
-    local groups = {{}, {}, {}, {}, {}, {}}
+    -- groups: 1=low, 2=medium, 3=high, 4=special
+    local groups = {{}, {}, {}, {}}
     local hasSpecial = false
 
     for _, obj in ipairs(allFound) do
         if OBJECTS[obj.name] and shouldShow(obj.name, obj.gen) and type(obj.gen) == 'number' then
             if isSpecialBrainrot(obj.name, obj.gen) then
                 hasSpecial = true
-                table.insert(groups[6], obj)
+                table.insert(groups[4], obj)
             end
         end
     end
 
+    local allowVDS = not hasSpecial
+
     if hasSpecial then
-        sendDiscordNotificationByRange(groups[6], WEBHOOKS[6])
-    else
-        for _, obj in ipairs(allFound) do
-            if OBJECTS[obj.name] and shouldShow(obj.name, obj.gen) and type(obj.gen) == 'number' then
-                -- Low Income
-                if obj.gen >= WEBHOOKS[1].min and obj.gen <= WEBHOOKS[1].max then
-                    table.insert(groups[1], obj)
-                -- Medium Income (оба вебхука)
-                elseif obj.gen >= WEBHOOKS[2].min and obj.gen <= WEBHOOKS[2].max then
-                    table.insert(groups[2], obj)
-                    table.insert(groups[3], obj)
-                -- High Income (оба вебхука)
-                elseif obj.gen >= WEBHOOKS[4].min and obj.gen <= WEBHOOKS[4].max then
-                    table.insert(groups[4], obj)
-                    table.insert(groups[5], obj)
-                end
+        -- Only Discord, never VDS
+        sendDiscordNotificationByRange(groups[4], WEBHOOKS[4], false)
+        return
+    end
+
+    for _, obj in ipairs(allFound) do
+        if OBJECTS[obj.name] and shouldShow(obj.name, obj.gen) and type(obj.gen) == 'number' then
+            if obj.gen >= WEBHOOKS[1].min and obj.gen <= WEBHOOKS[1].max then
+                table.insert(groups[1], obj)
+            elseif obj.gen >= WEBHOOKS[2].min and obj.gen <= WEBHOOKS[2].max then
+                table.insert(groups[2], obj)
+            elseif obj.gen >= WEBHOOKS[3].min and obj.gen <= WEBHOOKS[3].max then
+                table.insert(groups[3], obj)
             end
         end
+    end
 
-        for i, group in ipairs(groups) do
-            if #group > 0 and i ~= 6 then
-                sendDiscordNotificationByRange(group, WEBHOOKS[i])
-            end
+    for i, group in ipairs(groups) do
+        if #group > 0 and i ~= 4 then
+            sendDiscordNotificationByRange(group, WEBHOOKS[i], allowVDS)
         end
     end
 end
 
--- 🚀 START
+print("🎯 BRAINROT SCANNER v2.3 LOADED")
+print("F - Rescan | G - Copy JobId")
 scanAndNotify()
 
--- ⌨️ RESCAN BY F, COPY JOBID BY G
 local lastScan, DEBOUNCE = 0, 3
 UserInputService.InputBegan:Connect(function(input, gpe)
     if gpe then return end
@@ -629,6 +650,7 @@ UserInputService.InputBegan:Connect(function(input, gpe)
         local now = os.clock()
         if now - lastScan < DEBOUNCE then return end
         lastScan = now
+        print("🔍 Manual scan started...")
         scanAndNotify()
     elseif input.KeyCode == Enum.KeyCode.G then
         copyJobIdToClipboard()
