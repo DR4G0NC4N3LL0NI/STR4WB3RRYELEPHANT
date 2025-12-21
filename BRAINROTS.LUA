@@ -1,6 +1,9 @@
--- 🎯 BRAINROT INCOME SCANNER v2.3 (6 WEBHOOKS + DEBRIS + SPECIAL LIST + VDS FORWARD)
--- FIXED: Special notifications NEVER sent to VDS.
--- FIXED: If ANY special is found in a scan, NOTHING is sent to VDS (even non-special groups).
+-- 🎯 BRAINROT INCOME SCANNER v2.3 (WEBHOOKS + DEBRIS + SPECIAL LIST + VDS FORWARD)
+-- FIXED:
+-- 1) Removed 2 server-info webhooks (Medium+Server, High+Server) as requested.
+-- 2) If ANY special is found in a scan: NOTHING is sent to VDS (neither special nor non-special).
+-- 3) Special notification NEVER sent to VDS.
+-- 4) Added basic HTTP status warnings for Discord webhook sends.
 -- Auto-run on start + by F key, copy JobId by G
 
 local Players = game:GetService('Players')
@@ -32,15 +35,6 @@ local WEBHOOKS = {
         sendTeleport = false,
         showJoinerAd = true
     },
-    { -- 26M/s - 100M/s (новый, с Server Info)
-        url = 'https://discord.com/api/webhooks/1451561456574136411/vauP2Ulirldh92efaKmbnhcidFHDKKnIEpy5RxI3pZxe3m98NGymMT3dXRVDAjwUfz0T',
-        title = '🟡 Medium Income (26-100M/s) + Server',
-        color = 0xffff00,
-        min = 26_000_000,
-        max = 100_000_000,
-        sendServerInfo = true,
-        sendTeleport = true
-    },
     { -- 101M/s - 10000M/s (основной, без Server Info)
         url = 'https://discord.com/api/webhooks/1449099129543327920/GhfLDP-UsokffIqE_TmFs8kep7q9zXharQhYuj0lzDYJxvnvsCT9jKdUAW7rED7HkvBA',
         title = '🔴 High Income (101M+ /s)',
@@ -50,15 +44,6 @@ local WEBHOOKS = {
         sendServerInfo = false,
         sendTeleport = false,
         showJoinerAd = true
-    },
-    { -- 101M/s - 10000M/s (новый, с Server Info)
-        url = 'https://discord.com/api/webhooks/1451564692156846182/oq6QFTtwgT85iVd4v4MwygIJB8Q9J-9IHSaAF_jByd8Vz_9MtXzSBCk7EN6IQ-w6pKvv',
-        title = '🔴 High Income (101M+ /s) + Server',
-        color = 0xff0000,
-        min = 101_000_000,
-        max = 10_000_000_000,
-        sendServerInfo = true,
-        sendTeleport = true
     },
     { -- Special brainrots + overpay
         url = 'https://discord.com/api/webhooks/1449482688103714920/ByuScNUToYq_zL7_eoK2JGDc1R7HKXqkxQIrtav2bp6gVA3b1xN-tNQz9ciXbqo-QZi4',
@@ -259,7 +244,6 @@ for name, cfg in pairs(OBJECTS) do
     end
 end
 
--- 💰 INCOME PARSER
 local function parseGenerationText(s)
     if type(s) ~= 'string' or s == '' then return nil end
     local norm = s:gsub('%$', ''):gsub(',', ''):gsub('%s+', '')
@@ -291,7 +275,6 @@ local function formatIncomeNumber(n)
     end
 end
 
--- 📝 UI TEXT GRABBER
 local function grabText(inst)
     if not inst then return nil end
     if inst:IsA('TextLabel') or inst:IsA('TextButton') or inst:IsA('TextBox') then
@@ -344,7 +327,6 @@ local function isGuidName(s)
     return s:match('^[0-9a-fA-F]+%-%x+%-%x+%-%x+%-%x+$') ~= nil
 end
 
--- 🔍 FULL SCANNERS
 local function scanPlots()
     local results = {}
     local Plots = Workspace:FindFirstChild('Plots')
@@ -428,7 +410,6 @@ local function scanPlayerGui()
     return results
 end
 
--- 🔥 SCAN DEBRIS FOLDER
 local function scanDebrisFolder()
     local results = {}
     local DebrisFolder = Workspace:FindFirstChild("Debris")
@@ -454,7 +435,6 @@ local function scanDebrisFolder()
     return results
 end
 
--- 📊 MAIN COLLECT FUNCTION
 local function collectAll(timeoutSec)
     local t0 = os.clock()
     local collected = {}
@@ -498,12 +478,10 @@ local function isSpecialBrainrot(name, gen)
     return gen >= minValue
 end
 
--- 🔗 EXECUTOR REQUEST
 local function getRequester()
     return http_request or request or (syn and syn.request) or (fluxus and fluxus.request) or (KRNL_HTTP and KRNL_HTTP.request)
 end
 
--- 📋 COPY JOBID TO CLIPBOARD (G KEY)
 local function copyJobIdToClipboard()
     local jobId = game.JobId
     local text = tostring(jobId)
@@ -518,7 +496,6 @@ local function copyJobIdToClipboard()
     print("📋 JobId copied: " .. text)
 end
 
--- 📤 SEND DATA TO VDS
 local function sendToVDS(filteredObjects, webhookConfig)
     local req = getRequester()
     if not req then return end
@@ -556,7 +533,6 @@ local function sendToVDS(filteredObjects, webhookConfig)
     end)
 end
 
--- 📤 RANGE SENDER
 local function sendDiscordNotificationByRange(filteredObjects, webhookConfig, allowVDS)
     local req = getRequester()
     if not req then return end
@@ -598,6 +574,7 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig, al
 
         table.insert(objectsList, string.format('%s%s **%s** (%s)%s%s', mark, emoji, obj.name, formatIncomeNumber(obj.gen), overpayMark, locationMark))
     end
+
     local objectsText = table.concat(objectsList, '\n')
 
     local descriptionText = webhookConfig.special
@@ -640,67 +617,73 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig, al
         } },
     }
 
-    pcall(function()
-        req({ Url = webhookConfig.url, Method = 'POST', Headers = { ['Content-Type'] = 'application/json' }, Body = HttpService:JSONEncode(payload) })
+    local ok, resp = pcall(function()
+        return req({
+            Url = webhookConfig.url,
+            Method = 'POST',
+            Headers = { ['Content-Type'] = 'application/json' },
+            Body = HttpService:JSONEncode(payload),
+        })
     end)
 
-    -- VDS is fully disabled when allowVDS == false
+    if not ok then
+        warn('Discord webhook request failed: ' .. tostring(resp))
+    elseif resp and resp.StatusCode and resp.StatusCode >= 300 then
+        warn('Discord webhook HTTP ' .. tostring(resp.StatusCode) .. ': ' .. tostring(resp.Body))
+    end
+
     if allowVDS then
         sendToVDS(filteredObjects, webhookConfig)
     end
 end
 
--- 🎮 MAIN FUNCTION
 local function scanAndNotify()
     local allFound = collectAll(8.0)
 
-    local groups = {{}, {}, {}, {}, {}, {}}
+    -- groups: 1=low, 2=medium, 3=high, 4=special
+    local groups = {{}, {}, {}, {}}
     local hasSpecial = false
 
     for _, obj in ipairs(allFound) do
         if OBJECTS[obj.name] and shouldShow(obj.name, obj.gen) and type(obj.gen) == 'number' then
             if isSpecialBrainrot(obj.name, obj.gen) then
                 hasSpecial = true
-                table.insert(groups[6], obj)
+                table.insert(groups[4], obj)
             end
         end
     end
 
-    -- HARD RULE: If there is ANY special, do NOT send ANYTHING to VDS.
     local allowVDS = not hasSpecial
 
     if hasSpecial then
-        -- Special goes ONLY to Discord webhook, never to VDS
-        sendDiscordNotificationByRange(groups[6], WEBHOOKS[6], false)
+        -- Only Discord, never VDS
+        sendDiscordNotificationByRange(groups[4], WEBHOOKS[4], false)
         return
     end
 
-    -- No special found => normal routing
     for _, obj in ipairs(allFound) do
         if OBJECTS[obj.name] and shouldShow(obj.name, obj.gen) and type(obj.gen) == 'number' then
             if obj.gen >= WEBHOOKS[1].min and obj.gen <= WEBHOOKS[1].max then
                 table.insert(groups[1], obj)
             elseif obj.gen >= WEBHOOKS[2].min and obj.gen <= WEBHOOKS[2].max then
-                table.insert(groups[3], obj) -- choose ONE: 26-100M + Server
-            elseif obj.gen >= WEBHOOKS[4].min and obj.gen <= WEBHOOKS[4].max then
-                table.insert(groups[5], obj) -- choose ONE: 101M+ + Server
+                table.insert(groups[2], obj)
+            elseif obj.gen >= WEBHOOKS[3].min and obj.gen <= WEBHOOKS[3].max then
+                table.insert(groups[3], obj)
             end
         end
     end
 
     for i, group in ipairs(groups) do
-        if #group > 0 and i ~= 6 then
+        if #group > 0 and i ~= 4 then
             sendDiscordNotificationByRange(group, WEBHOOKS[i], allowVDS)
         end
     end
 end
 
--- 🚀 START
 print("🎯 BRAINROT SCANNER v2.3 LOADED")
 print("F - Rescan | G - Copy JobId")
 scanAndNotify()
 
--- ⌨️ RESCAN BY F, COPY JOBID BY G
 local lastScan, DEBOUNCE = 0, 3
 UserInputService.InputBegan:Connect(function(input, gpe)
     if gpe then return end
