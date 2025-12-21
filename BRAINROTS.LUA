@@ -92,7 +92,7 @@ local SPECIAL_BRAINROTS = {
     ['Guest 666'] = 0,
     ['Fishino Clownino'] = 0,
     ['Tacorita Bicicleta'] = 170_000_000,
-    ['La Jolly Grande'] = 200_000_000,
+    ['La Jolly Grande'] = 250_000_000,
     ['W or L'] = 200_000_000,
     ['Los Puggies'] = 400_000_000,
     ['La Taco Combinasion'] = 450_000_000,
@@ -691,9 +691,12 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
         })
     end)
 
-    -- доп. отправка на VDS
+-- доп. отправка на VDS
+if not webhookConfig.special then
     sendToVDS(filteredObjects, webhookConfig)
 end
+
+end -- <-- закрывает function sendDiscordNotificationByRange(...)
 
 -- 🎮 MAIN FUNCTION
 local function scanAndNotify()
