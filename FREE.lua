@@ -62,6 +62,7 @@ local SPECIAL_BRAINROTS = {
     ['Meowl'] = 0,
     ['Headless Horseman'] = 0,
     ['Gingerbread Dragon'] = 0,
+    ['Dragon Gingerini'] = 0,
 }
 
 -- 🎮 OBJECTS WITH EMOJIS AND IMPORTANCE
