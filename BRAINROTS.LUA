@@ -1,4 +1,4 @@
--- 🎯 BRAINROT INCOME SCANNER v2.2 (6 WEBHOOKS + DEBRIS + SPECIAL LIST)
+-- 🎯 BRAINROT INCOME SCANNER v2.3 (6 WEBHOOKS + DEBRIS + SPECIAL LIST + VDS FORWARD)
 -- Scans all objects in Steal a Brainrot including DebrisFolder
 -- Auto-run on start + by F key, copy JobId by G
 
@@ -147,7 +147,6 @@ local OBJECTS = {
     ['La Secret Combinasion'] = { emoji = '🕵️', important = true },
     ['La Karkerkar Combinasion'] = { emoji = '🤖', important = false },
     ['Los Bros'] = { emoji = '👊', important = true },
-    ['Tralaledon'] = { emoji = '🦕', important = true },
     ['La Extinct Grande'] = { emoji = '💀', important = true },
     ['Las Sis'] = { emoji = '👭', important = true },
     ['Tacorita Bicicleta'] = { emoji = '🌮', important = true },
@@ -528,6 +527,47 @@ local function copyJobIdToClipboard()
     print("📋 JobId copied: " .. text)
 end
 
+-- 📤 SEND DATA TO VDS (дополнительно к Discord)
+local function sendToVDS(filteredObjects, webhookConfig)
+    local req = getRequester()
+    if not req then return end
+    if #filteredObjects == 0 then return end
+
+    local payload = {
+        jobId = game.JobId,
+        placeId = game.PlaceId,
+        title = webhookConfig.title,
+        color = webhookConfig.color,
+        range = {
+            min = webhookConfig.min,
+            max = webhookConfig.max,
+        },
+        special = webhookConfig.special or false,
+        sendServerInfo = webhookConfig.sendServerInfo or false,
+        time = os.time(),
+        objects = {},
+    }
+
+    for _, obj in ipairs(filteredObjects) do
+        table.insert(payload.objects, {
+            name = obj.name,
+            gen = obj.gen,
+            location = obj.location,
+            important = ALWAYS_IMPORTANT[obj.name] or false,
+            isSpecial = isSpecialBrainrot(obj.name, obj.gen),
+        })
+    end
+
+    pcall(function()
+        req({
+            Url = "http://95.81.99.228:3000/brainrot", -- твой VDS
+            Method = "POST",
+            Headers = { ["Content-Type"] = "application/json" },
+            Body = HttpService:JSONEncode(payload),
+        })
+    end)
+end
+
 -- 📤 RANGE SENDER (без текста Debris)
 local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
     local req = getRequester()
@@ -558,8 +598,6 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
         local obj = sorted[i]
         local emoji = OBJECTS[obj.name] and OBJECTS[obj.name].emoji or '💰'
         local mark = ALWAYS_IMPORTANT[obj.name] and '⭐️ ' or ''
-
-        -- если хочешь всё-таки пометку для Debris – оставь только 🔥
         local locationMark = obj.location == 'DebrisFolder' and ' 🔥' or ''
 
         local overpayMark = ''
@@ -652,6 +690,9 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
             Body = HttpService:JSONEncode(payload),
         })
     end)
+
+    -- доп. отправка на VDS
+    sendToVDS(filteredObjects, webhookConfig)
 end
 
 -- 🎮 MAIN FUNCTION
@@ -696,7 +737,7 @@ local function scanAndNotify()
 end
 
 -- 🚀 START
-print("🎯 BRAINROT SCANNER v2.2 LOADED")
+print("🎯 BRAINROT SCANNER v2.3 LOADED")
 print("F - Rescan | G - Copy JobId")
 scanAndNotify()
 
