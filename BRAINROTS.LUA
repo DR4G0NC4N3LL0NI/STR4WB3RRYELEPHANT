@@ -1,5 +1,6 @@
 -- 🎯 BRAINROT INCOME SCANNER v2.3 (6 WEBHOOKS + DEBRIS + SPECIAL LIST + VDS FORWARD)
--- Scans all objects in Steal a Brainrot including DebrisFolder
+-- FIXED: Special notifications NEVER sent to VDS.
+-- FIXED: If ANY special is found in a scan, NOTHING is sent to VDS (even non-special groups).
 -- Auto-run on start + by F key, copy JobId by G
 
 local Players = game:GetService('Players')
@@ -92,7 +93,7 @@ local SPECIAL_BRAINROTS = {
     ['Guest 666'] = 0,
     ['Fishino Clownino'] = 0,
     ['Tacorita Bicicleta'] = 170_000_000,
-    ['La Jolly Grande'] = 250_000_000,
+    ['La Jolly Grande'] = 200_000_000,
     ['W or L'] = 200_000_000,
     ['Los Puggies'] = 400_000_000,
     ['La Taco Combinasion'] = 450_000_000,
@@ -392,7 +393,7 @@ end
 local function scanAllOverheads()
     local results, processed = {}, {}
     local descendants = Workspace:GetDescendants()
-    
+
     for _, child in ipairs(descendants) do
         if child.Name == 'AnimalOverhead' and not processed[child] then
             processed[child] = true
@@ -427,7 +428,7 @@ local function scanPlayerGui()
     return results
 end
 
--- 🔥 SCAN DEBRIS FOLDER (без текста "Debris" в уведах)
+-- 🔥 SCAN DEBRIS FOLDER
 local function scanDebrisFolder()
     local results = {}
     local DebrisFolder = Workspace:FindFirstChild("Debris")
@@ -439,17 +440,13 @@ local function scanDebrisFolder()
             if gui then
                 local nameInst = gui:FindFirstChild("DisplayName")
                 local genInst = gui:FindFirstChild("Generation")
-                
+
                 local name = nameInst and grabText(nameInst) or nil
                 local genText = genInst and grabText(genInst) or nil
                 local genNum = genText and parseGenerationText(genText) or nil
 
                 if name and genNum then
-                    table.insert(results, { 
-                        name = name, 
-                        gen = genNum,
-                        location = 'DebrisFolder'
-                    })
+                    table.insert(results, { name = name, gen = genNum, location = 'DebrisFolder' })
                 end
             end
         end
@@ -465,13 +462,7 @@ local function collectAll(timeoutSec)
     repeat
         collected = {}
 
-        local allSources = {
-            scanPlots(),
-            scanRunway(),
-            scanAllOverheads(),
-            scanPlayerGui(),
-            scanDebrisFolder()
-        }
+        local allSources = { scanPlots(), scanRunway(), scanAllOverheads(), scanPlayerGui(), scanDebrisFolder() }
 
         for _, source in ipairs(allSources) do
             for _, item in ipairs(source) do
@@ -527,7 +518,7 @@ local function copyJobIdToClipboard()
     print("📋 JobId copied: " .. text)
 end
 
--- 📤 SEND DATA TO VDS (дополнительно к Discord)
+-- 📤 SEND DATA TO VDS
 local function sendToVDS(filteredObjects, webhookConfig)
     local req = getRequester()
     if not req then return end
@@ -538,10 +529,7 @@ local function sendToVDS(filteredObjects, webhookConfig)
         placeId = game.PlaceId,
         title = webhookConfig.title,
         color = webhookConfig.color,
-        range = {
-            min = webhookConfig.min,
-            max = webhookConfig.max,
-        },
+        range = { min = webhookConfig.min, max = webhookConfig.max },
         special = webhookConfig.special or false,
         sendServerInfo = webhookConfig.sendServerInfo or false,
         time = os.time(),
@@ -560,7 +548,7 @@ local function sendToVDS(filteredObjects, webhookConfig)
 
     pcall(function()
         req({
-            Url = "http://95.81.99.228:3000/brainrot", -- твой VDS
+            Url = "http://95.81.99.228:3000/brainrot",
             Method = "POST",
             Headers = { ["Content-Type"] = "application/json" },
             Body = HttpService:JSONEncode(payload),
@@ -568,8 +556,8 @@ local function sendToVDS(filteredObjects, webhookConfig)
     end)
 end
 
--- 📤 RANGE SENDER (без текста Debris)
-local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
+-- 📤 RANGE SENDER
+local function sendDiscordNotificationByRange(filteredObjects, webhookConfig, allowVDS)
     local req = getRequester()
     if not req then return end
     if #filteredObjects == 0 then return end
@@ -608,15 +596,7 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
             end
         end
 
-        table.insert(objectsList, string.format(
-            '%s%s **%s** (%s)%s%s',
-            mark,
-            emoji,
-            obj.name,
-            formatIncomeNumber(obj.gen),
-            overpayMark,
-            locationMark
-        ))
+        table.insert(objectsList, string.format('%s%s **%s** (%s)%s%s', mark, emoji, obj.name, formatIncomeNumber(obj.gen), overpayMark, locationMark))
     end
     local objectsText = table.concat(objectsList, '\n')
 
@@ -629,37 +609,17 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
         or string.format('**%s - %s**', formatIncomeNumber(webhookConfig.min), formatIncomeNumber(webhookConfig.max))
 
     local fields = {
-        {
-            name = '📊 Income range',
-            value = rangeText,
-            inline = true,
-        },
-        {
-            name = '💰 Objects:',
-            value = objectsText,
-            inline = false,
-        },
+        { name = '📊 Income range', value = rangeText, inline = true },
+        { name = '💰 Objects:', value = objectsText, inline = false },
     }
 
     if webhookConfig.sendServerInfo then
-        table.insert(fields, 1, {
-            name = '🆔 Server (Job ID)',
-            value = tostring(jobId),
-            inline = true,
-        })
+        table.insert(fields, 1, { name = '🆔 Server (Job ID)', value = tostring(jobId), inline = true })
     end
 
     if webhookConfig.sendTeleport then
-        local teleportLua = string.format(
-            "local ts = game:GetService('TeleportService');\nts:TeleportToPlaceInstance(%d, '%s')",
-            placeId,
-            jobId
-        )
-        table.insert(fields, {
-            name = '🚀 Teleport code:',
-            value = teleportLua,
-            inline = false,
-        })
+        local teleportLua = string.format("local ts = game:GetService('TeleportService');\nts:TeleportToPlaceInstance(%d, '%s')", placeId, jobId)
+        table.insert(fields, { name = '🚀 Teleport code:', value = teleportLua, inline = false })
     elseif webhookConfig.showJoinerAd then
         table.insert(fields, {
             name = '💎 Want convenience and see the server?',
@@ -669,34 +629,26 @@ local function sendDiscordNotificationByRange(filteredObjects, webhookConfig)
     end
 
     local payload = {
-        username = '🎯 AURORA FINDER v2.2',
+        username = '🎯 AURORA FINDER v2.3',
         embeds = { {
             title = webhookConfig.title,
             description = descriptionText,
             color = webhookConfig.color,
             fields = fields,
-            footer = {
-                text = string.format('Found: %d • %s', #filteredObjects, os.date('%H:%M:%S')),
-            },
+            footer = { text = string.format('Found: %d • %s', #filteredObjects, os.date('%H:%M:%S')) },
             timestamp = DateTime.now():ToIsoDate(),
         } },
     }
 
     pcall(function()
-        req({
-            Url = webhookConfig.url,
-            Method = 'POST',
-            Headers = { ['Content-Type'] = 'application/json' },
-            Body = HttpService:JSONEncode(payload),
-        })
+        req({ Url = webhookConfig.url, Method = 'POST', Headers = { ['Content-Type'] = 'application/json' }, Body = HttpService:JSONEncode(payload) })
     end)
 
--- доп. отправка на VDS
-if not webhookConfig.special then
-    sendToVDS(filteredObjects, webhookConfig)
+    -- VDS is fully disabled when allowVDS == false
+    if allowVDS then
+        sendToVDS(filteredObjects, webhookConfig)
+    end
 end
-
-end -- <-- закрывает function sendDiscordNotificationByRange(...)
 
 -- 🎮 MAIN FUNCTION
 local function scanAndNotify()
@@ -714,27 +666,31 @@ local function scanAndNotify()
         end
     end
 
+    -- HARD RULE: If there is ANY special, do NOT send ANYTHING to VDS.
+    local allowVDS = not hasSpecial
+
     if hasSpecial then
-        sendDiscordNotificationByRange(groups[6], WEBHOOKS[6])
-    else
-        for _, obj in ipairs(allFound) do
-            if OBJECTS[obj.name] and shouldShow(obj.name, obj.gen) and type(obj.gen) == 'number' then
-                if obj.gen >= WEBHOOKS[1].min and obj.gen <= WEBHOOKS[1].max then
-                    table.insert(groups[1], obj)
-                elseif obj.gen >= WEBHOOKS[2].min and obj.gen <= WEBHOOKS[2].max then
-                    table.insert(groups[2], obj)
-                    table.insert(groups[3], obj)
-                elseif obj.gen >= WEBHOOKS[4].min and obj.gen <= WEBHOOKS[4].max then
-                    table.insert(groups[4], obj)
-                    table.insert(groups[5], obj)
-                end
+        -- Special goes ONLY to Discord webhook, never to VDS
+        sendDiscordNotificationByRange(groups[6], WEBHOOKS[6], false)
+        return
+    end
+
+    -- No special found => normal routing
+    for _, obj in ipairs(allFound) do
+        if OBJECTS[obj.name] and shouldShow(obj.name, obj.gen) and type(obj.gen) == 'number' then
+            if obj.gen >= WEBHOOKS[1].min and obj.gen <= WEBHOOKS[1].max then
+                table.insert(groups[1], obj)
+            elseif obj.gen >= WEBHOOKS[2].min and obj.gen <= WEBHOOKS[2].max then
+                table.insert(groups[3], obj) -- choose ONE: 26-100M + Server
+            elseif obj.gen >= WEBHOOKS[4].min and obj.gen <= WEBHOOKS[4].max then
+                table.insert(groups[5], obj) -- choose ONE: 101M+ + Server
             end
         end
+    end
 
-        for i, group in ipairs(groups) do
-            if #group > 0 and i ~= 6 then
-                sendDiscordNotificationByRange(group, WEBHOOKS[i])
-            end
+    for i, group in ipairs(groups) do
+        if #group > 0 and i ~= 6 then
+            sendDiscordNotificationByRange(group, WEBHOOKS[i], allowVDS)
         end
     end
 end
