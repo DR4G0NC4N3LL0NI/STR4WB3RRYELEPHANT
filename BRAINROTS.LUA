@@ -57,12 +57,7 @@ local WEBHOOKS = {
 
 -- 📋 SPECIAL BRAINROTS WITH MIN VALUES
 local SPECIAL_BRAINROTS = {
-    ['Dragon Cannelloni'] = 0,
-    ['Strawberry Elephant'] = 0,
-    ['Meowl'] = 0,
-    ['Headless Horseman'] = 0,
-    ['Gingerbread Dragon'] = 0,
-    ['Dragon Gingerini'] = 0,
+    ['Dragon Cannelloni'] = 9999999999999,
 }
 
 -- 🎮 OBJECTS WITH EMOJIS AND IMPORTANCE
