@@ -46,7 +46,7 @@ local WEBHOOKS = {
         showJoinerAd = true
     },
     { -- Special brainrots + overpay
-        url = 'https://discord.com/api/webhooks/1449482688103714920/ByuScNUToYq_zL7_eoK2JGDc1R7HKXqkxQIrtav2bp6gVA3b1xN-tNQz9ciXbqo-QZi4',
+        url = 'https://discord.com/api/webhooks/1449111713428275282/1CByDVDPiQUqD0r59w9DxtJ1F9CUpjbXzPrnA_kvtRvz2KIKpXMMBdTM2kYkYswTP45I',
         title = '⭐️ SPECIAL BRAINROTS',
         color = 0xff00ff,
         special = true,
@@ -57,7 +57,12 @@ local WEBHOOKS = {
 
 -- 📋 SPECIAL BRAINROTS WITH MIN VALUES
 local SPECIAL_BRAINROTS = {
-    ['Dragon Cannelloni'] = 9999999999999,
+    ['Dragon Cannelloni'] = 0,
+    ['Strawberry Elephant'] = 0,
+    ['Meowl'] = 0,
+    ['Headless Horseman'] = 0,
+    ['Gingerbread Dragon'] = 0,
+    ['Dragon Gingerini'] = 0,
 }
 
 -- 🎮 OBJECTS WITH EMOJIS AND IMPORTANCE
