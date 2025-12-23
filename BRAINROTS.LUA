@@ -492,11 +492,24 @@ local function getRequester()
     return http_request or request or (syn and syn.request) or (fluxus and fluxus.request) or (KRNL_HTTP and KRNL_HTTP.request)
 end
 
--- 🔒 Функция получения токена с VDS
+-- 🔒 Кэш токена
+local VDS_TOKEN_CACHE = {
+    token = nil,
+    expiresAt = 0
+}
+
+-- 🔒 Получение токена с VDS (с кэшированием)
 local function GetVDSToken()
     local req = getRequester()
     if not req then return nil end
     
+    -- Проверяем кэш (оставляем 5 минут запаса до истечения)
+    local now = os.time()
+    if VDS_TOKEN_CACHE.token and VDS_TOKEN_CACHE.expiresAt > (now + 300) then
+        return VDS_TOKEN_CACHE.token
+    end
+    
+    -- Получаем новый токен
     local success, response = pcall(function()
         return req({
             Url = VDS_URL .. "/auth",
@@ -511,11 +524,17 @@ local function GetVDSToken()
             return HttpService:JSONDecode(response.Body)
         end)
         if ok and data and data.token then
+            -- Сохраняем в кэш
+            VDS_TOKEN_CACHE.token = data.token
+            VDS_TOKEN_CACHE.expiresAt = math.floor((data.expiresAt or (now * 1000 + 3600000)) / 1000)
+            
+            print("🔑 New VDS token cached (scanner)")
             return data.token
         end
     end
     return nil
 end
+
 
 local function copyJobIdToClipboard()
     local jobId = game.JobId
