@@ -1,9 +1,10 @@
--- 🎯 BRAINROT INCOME SCANNER v2.3 (WEBHOOKS + DEBRIS + SPECIAL LIST + VDS FORWARD)
+-- 🎯 BRAINROT INCOME SCANNER v2.3 (WEBHOOKS + DEBRIS + SPECIAL LIST + VDS FORWARD + PASSWORD)
 -- FIXED:
 -- 1) Removed 2 server-info webhooks (Medium+Server, High+Server) as requested.
 -- 2) If ANY special is found in a scan: NOTHING is sent to VDS (neither special nor non-special).
 -- 3) Special notification NEVER sent to VDS.
 -- 4) Added basic HTTP status warnings for Discord webhook sends.
+-- 5) Added VDS password protection with token authentication
 -- Auto-run on start + by F key, copy JobId by G
 
 local Players = game:GetService('Players')
@@ -13,6 +14,10 @@ local StarterGui = game:GetService("StarterGui")
 local Workspace = game:GetService("Workspace")
 
 local localPlayer = Players.LocalPlayer
+
+-- 🔒 VDS PASSWORD
+local VDS_PASSWORD = "F0QW3E4yh555"
+local VDS_URL = "http://95.81.99.228:3000"
 
 -- ⚙️ WEBHOOK SETTINGS BY INCOME RANGE
 local WEBHOOKS = {
@@ -487,6 +492,31 @@ local function getRequester()
     return http_request or request or (syn and syn.request) or (fluxus and fluxus.request) or (KRNL_HTTP and KRNL_HTTP.request)
 end
 
+-- 🔒 Функция получения токена с VDS
+local function GetVDSToken()
+    local req = getRequester()
+    if not req then return nil end
+    
+    local success, response = pcall(function()
+        return req({
+            Url = VDS_URL .. "/auth",
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = HttpService:JSONEncode({password = VDS_PASSWORD})
+        })
+    end)
+    
+    if success and response and response.StatusCode == 200 then
+        local ok, data = pcall(function()
+            return HttpService:JSONDecode(response.Body)
+        end)
+        if ok and data and data.token then
+            return data.token
+        end
+    end
+    return nil
+end
+
 local function copyJobIdToClipboard()
     local jobId = game.JobId
     local text = tostring(jobId)
@@ -505,6 +535,13 @@ local function sendToVDS(filteredObjects, webhookConfig)
     local req = getRequester()
     if not req then return end
     if #filteredObjects == 0 then return end
+
+    -- 🔒 Получаем токен перед отправкой
+    local token = GetVDSToken()
+    if not token then 
+        warn("⚠️ Failed to get VDS token")
+        return 
+    end
 
     local payload = {
         jobId = game.JobId,
@@ -528,14 +565,23 @@ local function sendToVDS(filteredObjects, webhookConfig)
         })
     end
 
-    pcall(function()
-        req({
-            Url = "http://95.81.99.228:3000/brainrot",
+    local ok, resp = pcall(function()
+        return req({
+            Url = VDS_URL .. "/brainrot",
             Method = "POST",
-            Headers = { ["Content-Type"] = "application/json" },
+            Headers = { 
+                ["Content-Type"] = "application/json",
+                ["X-Aurora-Token"] = token  -- 🔒 Токен в заголовке
+            },
             Body = HttpService:JSONEncode(payload),
         })
     end)
+    
+    if ok and resp then
+        print("✅ Sent to VDS: " .. #filteredObjects .. " objects")
+    else
+        warn("⚠️ VDS send failed: " .. tostring(resp))
+    end
 end
 
 local function sendDiscordNotificationByRange(filteredObjects, webhookConfig, allowVDS)
@@ -685,7 +731,7 @@ local function scanAndNotify()
     end
 end
 
-print("🎯 BRAINROT SCANNER v2.3 LOADED")
+print("🎯 BRAINROT SCANNER v2.3 🔒 LOADED (PASSWORD PROTECTED)")
 print("F - Rescan | G - Copy JobId")
 scanAndNotify()
 
