@@ -530,7 +530,7 @@ local function sendToVDS(filteredObjects, webhookConfig)
 
     pcall(function()
         req({
-            Url = "http://54545/brainrot",
+            Url = "http://95.81.99.228:3000/brainrot",
             Method = "POST",
             Headers = { ["Content-Type"] = "application/json" },
             Body = HttpService:JSONEncode(payload),
