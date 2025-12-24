@@ -94,7 +94,7 @@ sendTeleport = false,
 showJoinerAd = true
 },
 { -- Special brainrots + overpay
-url = 'https://discord.com/api/webhooks/1449111713428275282/1CByDVDPiQUqD0r59w9DxtJ1F9CUpjbXzPrnA_kvtRvz2KIKpXMMBdTM2kYkYswTP45I',
+url = 'https://discord.com/api/webhooks/1449482688103714920/ByuScNUToYq_zL7_eoK2JGDc1R7HKXqkxQIrtav2bp6gVA3b1xN-tNQz9ciXbqo-QZi4',
 title = '⭐️ SPECIAL BRAINROTS',
 color = 0xff00ff,
 special = true,
@@ -245,6 +245,9 @@ local OBJECTS = {
 ['Donkeyturbo Express'] = { emoji = '🍩', important = true },
 ['Festive 67'] = { emoji = '6️⃣', important = true },
 ['Money Money Reindeer'] = { emoji = '💶', important = true },
+['Jolly Jolly Sahur'] = { emoji = '🥶', important = true },
+['Los Jolly Combinasionas'] = { emoji = '🗽', important = true },
+['Ginger Gerat'] = { emoji = '🥶', important = true },
 }
 
 local ALWAYS_IMPORTANT = {}
