@@ -153,6 +153,9 @@ local SPECIAL_BRAINROTS = {
 ['Dragon Gingerini'] = 0,
 ['Festive 67'] = 0,
 ['Money Money Reindeer'] = 0,
+['Dragon Gingerini'] = 0,
+['Jolly Jolly Sahur'] = 0,
+['Ginger Gerat'] = 0,
 }
 
 -- 🎮 OBJECTS WITH EMOJIS AND IMPORTANCE
@@ -288,6 +291,9 @@ local OBJECTS = {
 ['Donkeyturbo Express'] = { emoji = '🍩', important = true },
 ['Festive 67'] = { emoji = '6️⃣', important = true },
 ['Money Money Reindeer'] = { emoji = '💶', important = true },
+['Jolly Jolly Sahur'] = { emoji = '🥶', important = true },
+['Los Jolly Combinasionas'] = { emoji = '🗽', important = true },
+['Ginger Gerat'] = { emoji = '🎄', important = true },
 }
 
 local ALWAYS_IMPORTANT = {}
